@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, abort
+from flask import Flask, render_template, request, abort, jsonify
 import os
 import slack
 from urllib import request as req
@@ -254,22 +254,22 @@ def callback():
     reqs = message_manager.get_response(query)
     #reqs,link_url = make_response(url,query)
     
+    print("reqs=")
+    print(reqs)
+    
+    '''
     message = []
     for r in reqs:
       if "t" in r:
         sent = r["t"]
+        print("r[t]")
         print('> {}'.format(sent))
         message.append(sent)
       elif "tl" in r:
         sent = r["tl"]
+        print("r[tl]")
         print('> {}'.format(sent))
         message.append(sent)
-
-  
-    # if link_url:
-    #   reply_message = ''.join(reps) + "\n" + link_url
-    # else:
-    #   reply_message = ''.join(reps)
     
     reply_message = '\n'.join(message)
 
@@ -277,6 +277,41 @@ def callback():
         event.reply_token,
         TextSendMessage( text=reply_message )
       )
+    '''
+    
+    message = []
+    reply_TextSendMessage = []
+    ctr = 0;
+    
+    for r in reqs:
+      if "t" in r:
+        sent = r["t"]
+        print("r[t]")
+        print('> {}'.format(sent))
+        message.append(sent)
+        if ctr < 5:
+          reply_TextSendMessage += [TextSendMessage(text='{}'.format(sent)),]
+          ctr += 1
+          
+      elif "tl" in r:
+        sent = r["tl"]
+        print("r[tl]")
+        print('> {}'.format(sent))
+        message.append(sent)
+        if ctr < 5:
+          reply_TextSendMessage += [TextSendMessage(text='{}'.format(sent)),]
+          ctr += 1
+    
+    print("message=")
+    print(message)
+    
+    # reply_message = '\n'.join(message)
+
+    line_bot_api.reply_message(
+        event.reply_token,
+        reply_TextSendMessage
+      )
+    
     
     record_log_to_kintone( "LINE_BOT", event.message.text, event.source.user_id )     #event.source.userIdで無い理由は不明
     
@@ -291,6 +326,85 @@ def callback():
   
 
 ######## LINE bot (END) ########
+
+
+
+############################################
+# Google HOME (START)
+############################################
+@app.route('/googlehome/post', methods=['POST'])
+def recieve_post_googlehome():
+  print("recieve_post_googlehome")
+  
+  try:
+    # print("request=")
+    # print(request.json)
+    # 入力全文
+    query = request.json.get("queryResult").get("queryText")
+    print("query=" + query)
+    
+    ## TIPS
+    ## request.json.get("queryResult").get("parameters").get("VERB-Going) == "行く"の場合、～に行くという文脈
+    ## Dialogflowの @sys.place-attraction (トップ観光スポット)は英語しか対応していない模様なので使えない
+    
+  except AttributeError as e:
+    print("json.JSONDecodeError")
+    print(e)
+    message = "exception発生したよ"
+   
+  except ValueError as e:
+    print("ValueError")
+    print(e)
+    message = "exception発生したよ"
+  
+  
+  reqs = message_manager.get_response(query)
+    
+  message = []
+  links = []
+  for r in reqs:
+    if "v" in r:
+      sent = r["v"]
+      print('> {}'.format(sent))
+      message.append(sent)
+    elif "vl" in r:
+      link = r["vl"]
+      links.append(link)
+    
+  ####### push to LINE(START) #########
+  push_message = "{}\n{}".format(message[-1],links[-1])
+  
+  line_bot_api.push_message(
+    os.environ['LINE_PUSH_DESTINATION'],
+    TextSendMessage( text=push_message )
+  )
+  ####### push to LINE(END) ###########
+  
+  record_log_to_kintone( "GoogleHOME", query, "UNKNOWN" )     #event.source.userIdで無い理由は不明
+
+
+  response = {
+    "payload": {
+      "google": {
+        "expectUserResponse": True,
+        "richResponse": {
+          "items": [
+            {
+              "simpleResponse": {
+                "textToSpeech": ''.join(message[:-1])
+              }
+            }
+          ]
+        }
+      }
+    }
+  }
+  
+  return jsonify(response)
+  
+############################################
+# Google HOME (END)
+############################################
 
 
 if __name__ == '__main__':

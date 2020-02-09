@@ -1,0 +1,7 @@
+Flask
+gunicorn
+slackclient
+xmltodict
+requests
+line-bot-sdk
+ftfy

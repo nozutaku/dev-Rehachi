@@ -173,12 +173,12 @@ def check_proposal_comment(text):
     
   for ctr in comment_words:
     index = text.find(ctr)
-      if index >= 0:
-        ret = True
-        print("index=", index, " ret=", ret)
-        break
-      else:
-        print("index=", index, " ret=", ret)
-        ret = False
+    if index >= 0:
+      ret = True
+      print("index=", index, " ret=", ret)
+      break
+    else:
+      print("index=", index, " ret=", ret)
+      ret = False
     
   return ret

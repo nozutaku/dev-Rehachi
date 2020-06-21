@@ -389,7 +389,10 @@ def get_response(text, debug=False):
   # 利用者からの提案コメントの場合は別途返答
   is_proposal_comment = check_proposal_comment(text)
   if is_proposal_comment == True:
-    res = "コメントありがとう！ぼく、れはっちが真摯に検討するね。"
+    res = {
+      't': 'コメントありがとう！これで君も、「ちーむ れはっち」の仲間だ！今後もよろしくね',
+      'v': 'コメントありがとう！これで君も、「ちーむ れはっち」の仲間だ！今後もよろしくね',
+    }
     return res
   
   # キーワードを抽出

@@ -161,3 +161,31 @@ def make_voice(text, max_length=100):
   # 長すぎる質問を適当なところでカット
   ret = shorten_text(ret, max_length=max_length)
   return ret
+
+def check_proposal_comment(text):
+  '''
+  提案/コメント　等か否か判断する
+  '''
+  comment_word = ["コメント", "提案"]
+  
+  if 
+  
+def check_proposal_comment(text):
+  '''
+  提案/コメント　等か否か判断する
+  '''    
+  comment_words = ["コメント", "提案", "提言", "こめんと", "comment"]
+    
+  ret = False
+    
+  for ctr in comment_words:
+    index = text.find(ctr)
+      if index >= 0:
+        ret = True
+        print("index=", index, " ret=", ret)
+        break
+      else:
+        print("index=", index, " ret=", ret)
+        ret = False
+    
+  return ret

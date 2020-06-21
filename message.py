@@ -5,7 +5,7 @@ import json
 import os
 import random
 
-from text_utils import get_keywords, shorten_text, make_voice
+from text_utils import get_keywords, shorten_text, make_voice, check_proposal_comment
 import refkyo
 import wikipedia
 
@@ -385,6 +385,12 @@ def get_response(text, debug=False):
   if debug:
     print('text: {}'.format(text))
     print()
+    
+  # 利用者からの提案コメントの場合は別途返答
+  is_proposal_comment = check_proposal_comment(text)
+  if is_proposal_comment True:
+    res = "コメントありがとう！ぼく、れはっちが真摯に検討するね。"
+    return res
   
   # キーワードを抽出
   keywords = get_keywords(text)

@@ -399,7 +399,7 @@ def get_response(text, debug=False):
       'tl': 'コメントありがとう！これで君も、「ちーむ れはっち」の仲間だ！今後もよろしくね',
       'vl': 'コメントありがとう！これで君も、「ちーむ れはっち」の仲間だ！今後もよろしくね',
     }]
-    return res
+    return comment_res
   
   
   # キーワードを抽出
